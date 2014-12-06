@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="press">#45000000</color>
+    <color name="background_tab_pressed">#668c6239</color>
+    <color name="background_contact_pressed">#66acacac</color>
+    <color name="state_shop_press">#AFe1e1e1</color>
+
+</resources>
