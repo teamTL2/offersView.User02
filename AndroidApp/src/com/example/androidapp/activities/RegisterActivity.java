@@ -13,6 +13,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,24 +29,25 @@ import com.example.androidapp.R;
 import com.example.androidapp.DAO.JSONParser;
 
 
-//Login View
-public class LoginActivity extends Activity{
+//Register View
+public class RegisterActivity extends Activity{
 	
-	private EditText email,password;
-	private Button button, buttonR;
+	private EditText email,password,rePassword;
+	private Button button,buttonReturn;
 	private ProgressDialog pDialog;
 	
-	
-	
+
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_login);
+		setContentView(R.layout.activity_register);
 		
-		email = (EditText) findViewById(R.id.login_email);
-		password = (EditText) findViewById(R.id.login_edit_password);
-		pDialog = new ProgressDialog(LoginActivity.this);
+		email = (EditText) findViewById(R.id.Register_email);
+		password = (EditText) findViewById(R.id.Register_password);
+		rePassword = (EditText) findViewById(R.id.Re_Register_password);
+		pDialog = new ProgressDialog(RegisterActivity.this);
 		password.setOnEditorActionListener(new OnEditorActionListener() {
 		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		        if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -56,31 +58,33 @@ public class LoginActivity extends Activity{
 		    }
 		});
 		
-		button = (Button) findViewById(R.id.btnLogin);
-		buttonR = (Button) findViewById(R.id.btnNewUser);
+		button = (Button) findViewById(R.id.btnRegister);
+		buttonReturn = (Button) findViewById(R.id.btnReturn);
 		
-		buttonR.setOnClickListener(new OnClickListener() {
+		buttonReturn.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				Intent intetn = new Intent(getApplicationContext(),RegisterActivity.class);
+				Intent intetn = new Intent(getApplicationContext(),LoginActivity.class);
         		
         		startActivity(intetn);
         		finish();
-			}
-		});
-		
-		
+				}
+			});
+			
+	
 		button.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				if (!email.getText().toString().equals("") && !password.getText().toString().equals("")) {
+				if (!email.getText().toString().equals("") 
+						&& !password.getText().toString().equals("")
+						&& !rePassword.getText().toString().equals("") 
+						&&	password.getText().toString().equals(rePassword.getText().toString())) {
 					
-					new LoginOperation(email.getText().toString(),password.getText().toString()).execute();
-					
+					new RegisterOperation(email.getText().toString(),password.getText().toString()).execute();
 				}
 
 			}
@@ -89,20 +93,21 @@ public class LoginActivity extends Activity{
 	}
 	
 	
-	private class LoginOperation extends AsyncTask<String, Void, Boolean> {
+	
+	private class RegisterOperation extends AsyncTask<String, Void, Boolean> {
 		
 		// JSON parser class
 	    JSONParser jsonParser = new JSONParser();
 	    
-	    // login url
-	    private static final String url_login = "http://10.0.2.2:1337/android_connect/android_connect/stratos/login.php";
+	    // register url
+	    private static final String url_register = "http://10.0.2.2:1337/android_connect/stratos/create_user.php";
 
 	    // JSON Node names
 	    private static final String TAG_SUCCESS = "success";
 	    
 		String email,password;
-		
-		public LoginOperation(String email,String password)
+
+		public RegisterOperation(String email,String password)
 		{
 			this.email = email;
 			this.password = password;
@@ -110,9 +115,9 @@ public class LoginActivity extends Activity{
 		
 		@Override
         protected void onPreExecute() {
-        	pDialog.setMessage("Γίνετε ο έλεγχος των στοιχείων...");
+        	pDialog.setMessage("Γίνεται ο έλεγχος των στοιχείων...");
 			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(false);
+			pDialog.setCancelable(true);
 			pDialog.show();
         }
 		
@@ -121,20 +126,20 @@ public class LoginActivity extends Activity{
         	
         	
         	int success;
-        	boolean result = true;
-        	
+        	boolean result;
+        	result = true;
         	try {
         		// Building Parameters
         		List<NameValuePair> params = new ArrayList<NameValuePair>();
         		params.add(new BasicNameValuePair("Username", email));
         	    params.add(new BasicNameValuePair("Password", password));
 
-        		// getting user details by making HTTP request
-        		// Note that user details url will use GET request
+        		//Posting user data to script
+        		// Note that register url will use POST request
         		JSONObject json = jsonParser.makeHttpRequest(
-                    url_login, "GET", params);
+                    url_register, "POST", params);
 
-        		
+        		Log.d("Create Response", json.toString());
 
         		// json success tag
           	  	success = json.getInt(TAG_SUCCESS);
@@ -158,7 +163,7 @@ public class LoginActivity extends Activity{
         	//Result Message
         	if(result)
         	{
-        		Toast.makeText(getApplicationContext(), "Καλώς ήρθατε", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(getApplicationContext(), "Η εγγραφή σας ολοκληρώθηκε", Toast.LENGTH_SHORT).show();
         		
         		Intent intetn = new Intent(getApplicationContext(),MainActivity.class);
         		
@@ -166,7 +171,7 @@ public class LoginActivity extends Activity{
         		finish();
         	}
         	else
-        		Toast.makeText(getApplicationContext(), "Τα στοιχεία είναι λάθος", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(getApplicationContext(), "Η εγγραφή απέτυχε", Toast.LENGTH_SHORT).show();
         }
 
     }
