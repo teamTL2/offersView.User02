@@ -9,7 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -79,14 +81,37 @@ public class RegisterActivity extends Activity{
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+				
+				AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(RegisterActivity.this);
+				
 				if (!email.getText().toString().equals("") 
 						&& !password.getText().toString().equals("")
 						&& !rePassword.getText().toString().equals("") 
-						&&	password.getText().toString().equals(rePassword.getText().toString())) {
-					
+						&&	password.getText().toString().equals(rePassword.getText().toString())){
 					new RegisterOperation(email.getText().toString(),password.getText().toString()).execute();
-				}
+				} 
+				else if(email.getText().toString().equals("") || password.getText().toString().equals("")
+								|| rePassword.getText().toString().equals("")){
+						alertDialog2.setMessage("Παρακαλώ συμπληρώστε όλα τα πεδία");
+						alertDialog2.setCancelable(true);
+						alertDialog2.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+						            public void onClick(DialogInterface dialog, int which) {
+						            	dialog.cancel();
+						            }
+						        });
+						alertDialog2.show();
 
+				} 
+				else if(!password.getText().toString().equals(rePassword.getText().toString())){
+						alertDialog2.setMessage("Παρακαλώ βεβαιωθείτε πως οι κωδικοί ταιριάζουν");
+						alertDialog2.setCancelable(true);
+						alertDialog2.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+						            public void onClick(DialogInterface dialog, int which) {
+						            	dialog.cancel();
+						            }
+						        });
+						alertDialog2.show();
+				}
 			}
 		});
 	
